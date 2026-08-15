@@ -24,7 +24,11 @@ const init = async () => {
     host: process.env.HOST,
     routes: {
       cors: {
-        origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+        origin: [
+          "http://localhost:3000",
+          "http://127.0.0.1:3000",
+          "https://hello-booth.vercel.app/",
+        ],
         credentials: true,
         additionalHeaders: ["cache-control", "x-requested-with"],
       },
