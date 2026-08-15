@@ -18,7 +18,7 @@ export async function GET() {
     // Format data menjadi { "2026-07-20": 1, "2026-07-21": 4 }
     const availabilityMap: Record<string, number> = {};
 
-    result.rows.forEach((row) => {
+    result.rows.forEach((row: any) => {
       // Pastikan string tanggal ada sebelum dimasukkan ke map
       if (row.date_str) {
         availabilityMap[row.date_str] = parseInt(row.total_booked);
