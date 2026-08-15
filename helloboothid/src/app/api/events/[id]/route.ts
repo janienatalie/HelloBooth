@@ -77,7 +77,7 @@ export async function GET(
 
     const mainPackageName = normalizeText(eventRes.rows[0].package_name);
 
-    itemsRes.rows.forEach((item) => {
+    itemsRes.rows.forEach((item: any) => {
       if ((item.item_type || "").toLowerCase().includes("service")) {
         const qty = parseInt(item.quantity) || 1;
         const rawItemName = item.item_name || eventRes.rows[0].package_name;

@@ -43,7 +43,7 @@ export async function GET() {
       ORDER BY e.event_date DESC, e.event_time DESC
     `);
 
-    const formattedEvents = result.rows.map((row) => {
+    const formattedEvents = result.rows.map((row: any) => {
       let currentStatus = (row.status || "inquiry").toLowerCase();
 
       if (

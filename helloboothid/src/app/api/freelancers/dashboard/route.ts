@@ -74,7 +74,7 @@ export async function GET(req: Request) {
     const upcomingSchedules: any[] = [];
 
     // 3. Kalkulasi Kronologis Real-Time (Mendeteksi Jam & Tanggal)
-    eventsRes.rows.forEach((evt) => {
+    eventsRes.rows.forEach((evt: any) => {
       let isCompleted = false;
 
       // Jika admin sudah set manual ke 'done'

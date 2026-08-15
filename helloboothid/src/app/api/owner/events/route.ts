@@ -45,14 +45,14 @@ export async function GET(req: Request) {
     const servicePriceMap: Record<string, { b2b: number; b2c: number }> = {};
     const addonPriceMap: Record<string, { b2b: number; b2c: number }> = {};
 
-    (servicesRes.rows || []).forEach((s) => {
+    (servicesRes.rows || []).forEach((s: any) => {
       servicePriceMap[s.id] = {
         b2b: parseFloat(s.price_b2b) || 0,
         b2c: parseFloat(s.price_b2c) || 0,
       };
     });
 
-    (addonsRes.rows || []).forEach((a) => {
+    (addonsRes.rows || []).forEach((a: any) => {
       // Fallback yang aman: ambil price_b2b/b2c jika ada, kalau tidak ada pakai base_price
       addonPriceMap[a.id] = {
         b2b: parseFloat(a.price_b2b || a.base_price) || 0,
@@ -62,16 +62,16 @@ export async function GET(req: Request) {
 
     const now = new Date();
 
-    const formattedData = events.map((row) => {
+    const formattedData = events.map((row: any) => {
       let grossTotal = 0;
       // Deteksi divisi klien untuk penentuan harga (Default ke B2C jika kosong)
       const cType = (row.client_type || "B2C").toUpperCase();
 
       const itemsForThisEvent = eventItems.filter(
-        (ei) => ei.event_id === row.id,
+        (ei: any) => ei.event_id === row.id,
       );
 
-      itemsForThisEvent.forEach((item) => {
+      itemsForThisEvent.forEach((item: any) => {
         let itemPrice = parseFloat(item.item_price);
 
         // Jika harga di event_items kosong, ambil dari master data (Service/Addon)

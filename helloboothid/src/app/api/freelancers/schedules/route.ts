@@ -63,7 +63,7 @@ export async function GET(req: Request) {
     // 4. LOGIKA STATUS OTOMATIS BERBASIS TANGGAL & WAKTU (VIRTUAL)
     const now = new Date(); // Detik ini juga
 
-    const formattedSchedules = schedulesRes.rows.map((row) => {
+    const formattedSchedules = schedulesRes.rows.map((row: any) => {
       let calculatedStatus = "Upcoming";
 
       try {

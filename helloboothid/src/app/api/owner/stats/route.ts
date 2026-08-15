@@ -52,13 +52,13 @@ export async function GET(req: Request) {
     const servicePriceMap: Record<string, { b2b: number; b2c: number }> = {};
     const addonPriceMap: Record<string, { b2b: number; b2c: number }> = {};
 
-    (servicesRes.rows || []).forEach((s) => {
+    (servicesRes.rows || []).forEach((s: any) => {
       servicePriceMap[s.id] = {
         b2b: parseFloat(s.price_b2b) || 0,
         b2c: parseFloat(s.price_b2c) || 0,
       };
     });
-    (addonsRes.rows || []).forEach((a) => {
+    (addonsRes.rows || []).forEach((a: any) => {
       addonPriceMap[a.id] = {
         b2b: parseFloat(a.price_b2b || a.base_price) || 0,
         b2c: parseFloat(a.price_b2c || a.base_price) || 0,
@@ -82,13 +82,13 @@ export async function GET(req: Request) {
     }));
 
     // LOOPING EKSEKUSI
-    eventsRes.rows.forEach((row) => {
+    eventsRes.rows.forEach((row: any) => {
       const cType = (row.client_type || "B2C").toUpperCase();
 
       let grossTotal = 0;
-      const items = itemsRes.rows.filter((ei) => ei.event_id === row.id);
+      const items = itemsRes.rows.filter((ei: any) => ei.event_id === row.id);
 
-      items.forEach((item) => {
+      items.forEach((item: any) => {
         let itemPrice = parseFloat(item.item_price);
         if (!itemPrice) {
           const typeStr = item.item_type?.toLowerCase().trim();

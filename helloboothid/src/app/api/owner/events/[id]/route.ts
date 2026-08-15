@@ -65,7 +65,7 @@ export async function GET(
     const priceMap: Record<string, { b2b: number; b2c: number }> = {};
     const nameMap: Record<string, string> = {};
 
-    (servicesRes.rows || []).forEach((s) => {
+    (servicesRes.rows || []).forEach((s: any) => {
       priceMap[`service_${s.id}`] = {
         b2b: parseFloat(s.price_b2b) || 0,
         b2c: parseFloat(s.price_b2c) || 0,
@@ -73,7 +73,7 @@ export async function GET(
       nameMap[`service_${s.id}`] = s.name;
     });
 
-    (addonsRes.rows || []).forEach((a) => {
+    (addonsRes.rows || []).forEach((a: any) => {
       priceMap[`addon_${a.id}`] = {
         b2b: parseFloat(a.price_b2b || a.base_price) || 0,
         b2c: parseFloat(a.price_b2c || a.base_price) || 0,
@@ -88,7 +88,7 @@ export async function GET(
     let finalBackdrop = "";
     let finalNotes = eventData.notes || "";
 
-    const formattedItems = itemsRes.rows.map((item) => {
+    const formattedItems = itemsRes.rows.map((item: any) => {
       // Skenario 1: Jika disimpan sebagai kolom di event_items
       if (item.backdrop_theme && !finalBackdrop)
         finalBackdrop = item.backdrop_theme;
@@ -135,7 +135,7 @@ export async function GET(
     });
 
     // Menyembunyikan item khusus "info" dari rincian tabel tagihan jika harganya 0
-    const displayItems = formattedItems.filter((item) => {
+    const displayItems = formattedItems.filter((item: any) => {
       const t = (item.item_type || "").toLowerCase().trim();
       if (
         (t === "backdrop" || t === "notes" || t === "note") &&

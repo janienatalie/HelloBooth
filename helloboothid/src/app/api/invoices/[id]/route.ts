@@ -77,14 +77,14 @@ export async function GET(
 
     const isB2B = String(eventData.client_type).toUpperCase() === "B2B";
 
-    addonsRes.rows.forEach((item) => {
+    addonsRes.rows.forEach((item: any) => {
       masterMap[`addon_${item.id}`] = {
         name: item.name,
         price: parseFloat(item.base_price) || 0,
       };
     });
 
-    servicesRes.rows.forEach((item) => {
+    servicesRes.rows.forEach((item: any) => {
       const fallbackPrice = isB2B
         ? parseFloat(item.price_b2b)
         : parseFloat(item.price_b2c);
@@ -97,7 +97,7 @@ export async function GET(
 
     // 3. Hitung Kalkulasi Finansial
     let subtotal = 0;
-    const formattedItems = itemsRes.rows.map((item) => {
+    const formattedItems = itemsRes.rows.map((item: any) => {
       const typeKey = `${item.item_type?.toLowerCase() === "service" ? "service" : "addon"}_${item.item_id}`;
 
       const price =
@@ -146,7 +146,7 @@ export async function GET(
             query(
               "UPDATE invoices SET payment_status = 'Overdue' WHERE id = $1",
               [eventData.invoice_id],
-            ).catch((err) =>
+            ).catch((err: any) =>
               console.error("Gagal auto-update Overdue di detail:", err),
             );
           }

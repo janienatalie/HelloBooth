@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       (text || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
     // Hitung limit maksimal
-    itemsRes.rows.forEach((item) => {
+    itemsRes.rows.forEach((item: any) => {
       const qty = parseInt(item.quantity) || 1;
       const itemName = normalizeText(item.item_name);
 

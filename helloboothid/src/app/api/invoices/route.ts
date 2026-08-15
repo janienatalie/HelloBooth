@@ -59,7 +59,7 @@ export async function GET() {
     `);
 
     // Pemrosesan data untuk dicocokkan dengan kebutuhan page.tsx
-    const formattedInvoices = result.rows.map((row) => {
+    const formattedInvoices = result.rows.map((row: any) => {
       const amount = Number(row.total_amount) || 0;
       const paidAmount = Number(row.paid_amount) || 0;
       const balance = amount - paidAmount;

@@ -152,7 +152,7 @@ export async function GET(
       [eventId, fId],
     );
 
-    const partnersList = partnersRes.rows.map((p) => {
+    const partnersList = partnersRes.rows.map((p: any) => {
       let pPhone = p.phone || "";
       if (pPhone.startsWith("08")) {
         pPhone = "628" + pPhone.slice(2);
