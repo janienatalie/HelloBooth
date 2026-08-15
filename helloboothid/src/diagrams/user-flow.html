@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diagram Alur Pengguna Hellobooth</title>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 24px;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 24px;
+      }
+      .mermaid {
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Diagram Alur Pengguna - HelloBooth</h1>
+      <div class="mermaid">
+flowchart TD
+    A[Pengunjung / Guest] --> B[Masuk Halaman Utama]
+    B --> C{Sudah punya akun?}
+    C -- Tidak --> D[Login / Register]
+    D --> E[Masuk ke sistem]
+    C -- Ya --> E
+
+    E --> F[Role: Admin / Owner]
+    E --> G[Role: Sales / Operational]
+    E --> H[Role: Freelancer / Crew]
+
+    F --> F1[Dashboard Admin]
+    F1 --> F2[Kelola Klien]
+    F1 --> F3[Kelola Event]
+    F1 --> F4[Kelola Layanan & Addon]
+    F1 --> F5[Kelola Invoice]
+    F1 --> F6[Lihat Statistik & Omzet]
+
+    G --> G1[Dashboard Sales]
+    G1 --> G2[Pilih Klien]
+    G2 --> G3[Isi Detail Event]
+    G3 --> G4[Pilih Paket & Addon]
+    G4 --> G5[Simpan Event]
+    G5 --> G6[Sistem buat Invoice otomatis]
+
+    H --> H1[Dashboard Freelancer]
+    H1 --> H2[Lihat Jadwal Event]
+    H2 --> H3[Update Ketersediaan]
+
+    F3 --> F7[Periksa Ketersediaan Tanggal]
+    F7 --> F8{Tanggal tersedia?}
+    F8 -- Ya --> F9[Buat Booking]
+    F8 -- Tidak --> F10[Pilih tanggal lain]
+
+    F9 --> G5
+
+    F2 --> F11[Tambah / Edit / Hapus Klien]
+    F4 --> F12[Tambah / Edit / Hapus Paket & Addon]
+    F5 --> F13[Review Status Pembayaran]
+      </div>
+    </div>
+  </body>
+</html>

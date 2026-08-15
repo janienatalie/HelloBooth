@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mermaid Use Case Render</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; }
+  .mermaid { background: white; }
+</style>
+</head>
+<body>
+<div class="mermaid">
+graph LR
+
+Guest[Guest]
+Client[Client]
+Freelancer[Freelancer]
+Owner[Owner]
+Admin[Admin]
+
+UC_Layanan((Lihat Layanan))
+UC_Register((Register / Login))
+UC_Login((Login))
+UC_Logout((Logout))
+UC_Booking((Booking / Buat Event))
+UC_Availability((Lihat Ketersediaan))
+UC_Invoice((Lihat Invoice))
+UC_Jadwal((Lihat Jadwal))
+UC_KelolaKetersediaan((Kelola Ketersediaan))
+UC_KelolaEvent((Kelola Event))
+UC_KelolaKlien((Kelola Klien))
+UC_KelolaFreelancer((Kelola Freelancer))
+UC_KelolaLayanan((Kelola Layanan & Addons))
+UC_KelolaAddons((Kelola Addons))
+UC_KelolaInvoice((Kelola Invoice))
+UC_Dashboard((Lihat Dashboard / Statistik / Sales))
+UC_Pengaturan((Kelola Pengaturan))
+UC_KelolaPengguna((Kelola Pengguna))
+
+Guest --> UC_Layanan
+Guest --> UC_Register
+
+Client --> UC_Login
+Client --> UC_Logout
+Client --> UC_Layanan
+Client --> UC_Booking
+Client --> UC_Availability
+Client --> UC_Invoice
+
+Freelancer --> UC_Login
+Freelancer --> UC_Logout
+Freelancer --> UC_Jadwal
+Freelancer --> UC_KelolaKetersediaan
+
+Owner --> UC_Login
+Owner --> UC_Logout
+Owner --> UC_KelolaEvent
+Owner --> UC_KelolaKlien
+Owner --> UC_KelolaFreelancer
+Owner --> UC_KelolaLayanan
+Owner --> UC_KelolaInvoice
+Owner --> UC_Dashboard
+Owner --> UC_Pengaturan
+
+Admin --> UC_Login
+Admin --> UC_Logout
+Admin --> UC_KelolaPengguna
+Admin --> UC_Pengaturan
+Admin --> UC_KelolaAddons
+Admin --> UC_Dashboard
+
+UC_Layanan --> UC_Booking
+UC_KelolaEvent --> UC_KelolaKlien
+UC_KelolaLayanan --> UC_KelolaAddons
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.13.10/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+</body>
+</html>

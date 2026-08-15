@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Warna Biru HelloBooth Logo (Lebih cerah dan kontras) */
+  --color-primary: #3896f5; /* Blue 500 */
+  --color-primary-hover: #2563eb; /* Blue 600 */
+  --color-primary-light: #eff6ff; /* Blue 50 */
+}
+
+@layer base {
+  body {
+    /* Setelan Light Mode Default */
+    @apply bg-slate-50 text-slate-900 transition-colors duration-300;
+  }
+
+  /* Setelan Dark Mode Default saat tombol ditekan */
+  .dark body {
+    @apply bg-slate-900 text-slate-50;
+  }
+}

@@ -1,0 +1,99 @@
+%% Use Case Diagram for Hellobooth Website
+
+graph LR
+
+Guest[Guest]
+Client[Client]
+Freelancer[Freelancer]
+Owner[Owner]
+Admin[Admin]
+
+UC_Layanan((Lihat Layanan))
+UC_Register((Register / Login))
+UC_Login((Login))
+UC_Logout((Logout))
+UC_Booking((Booking / Buat Event))
+UC_Availability((Lihat Ketersediaan))
+UC_Invoice((Lihat Invoice))
+UC_Jadwal((Lihat Jadwal))
+UC_KelolaKetersediaan((Kelola Ketersediaan))
+UC_KelolaEvent((Kelola Event))
+UC_KelolaKlien((Kelola Klien))
+UC_KelolaFreelancer((Kelola Freelancer))
+UC_KelolaLayanan((Kelola Layanan & Addons))
+UC_KelolaAddons((Kelola Addons))
+UC_KelolaInvoice((Kelola Invoice))
+UC_Dashboard((Lihat Dashboard / Statistik / Sales))
+UC_Pengaturan((Kelola Pengaturan))
+UC_KelolaPengguna((Kelola Pengguna))
+
+Guest --> UC_Layanan
+Guest --> UC_Register
+
+Client --> UC_Login
+Client --> UC_Logout
+Client --> UC_Layanan
+Client --> UC_Booking
+Client --> UC_Availability
+Client --> UC_Invoice
+
+Freelancer --> UC_Login
+Freelancer --> UC_Logout
+Freelancer --> UC_Jadwal
+Freelancer --> UC_KelolaKetersediaan
+
+Owner --> UC_Login
+Owner --> UC_Logout
+Owner --> UC_KelolaEvent
+Owner --> UC_KelolaKlien
+Owner --> UC_KelolaFreelancer
+Owner --> UC_KelolaLayanan
+Owner --> UC_KelolaInvoice
+Owner --> UC_Dashboard
+Owner --> UC_Pengaturan
+
+Admin --> UC_Login
+Admin --> UC_Logout
+Admin --> UC_KelolaPengguna
+Admin --> UC_Pengaturan
+Admin --> UC_KelolaAddons
+Admin --> UC_Dashboard
+
+UC_Layanan --> UC_Booking
+UC_KelolaEvent --> UC_KelolaKlien
+UC_KelolaLayanan --> UC_KelolaAddons
+:Guest: --> (Lihat Layanan)
+:Guest: --> (Register / Login)
+
+:Client: --> (Login)
+:Client: --> (Logout)
+:Client: --> (Lihat Layanan)
+:Client: --> (Booking / Buat Event)
+:Client: --> (Lihat Ketersediaan)
+:Client: --> (Lihat Invoice)
+
+:Freelancer: --> (Login)
+:Freelancer: --> (Logout)
+:Freelancer: --> (Lihat Jadwal)
+:Freelancer: --> (Kelola Ketersediaan)
+
+:Owner: --> (Login)
+:Owner: --> (Logout)
+:Owner: --> (Kelola Event)
+:Owner: --> (Kelola Klien)
+:Owner: --> (Kelola Freelancer)
+:Owner: --> (Kelola Layanan & Addons)
+:Owner: --> (Kelola Invoice)
+:Owner: --> (Lihat Dashboard / Statistik / Sales)
+:Owner: --> (Kelola Pengaturan)
+
+:Admin: --> (Login)
+:Admin: --> (Logout)
+:Admin: --> (Kelola Pengguna)
+:Admin: --> (Kelola Pengaturan)
+:Admin: --> (Kelola Addons)
+:Admin: --> (Lihat Dashboard / Statistik / Sales)
+
+(Lihat Layanan) ..> (Booking / Buat Event) : <<include>>
+(Kelola Event) ..> (Kelola Klien) : <<include>>
+(Kelola Layanan & Addons) ..> (Kelola Addons) : <<include>>

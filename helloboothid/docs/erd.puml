@@ -1,0 +1,131 @@
+@startuml
+' ERD for HelloBooth (based on code inspection)
+' Entities and cardinalities reflect implementation (nullable FKs, polymorphic event_items snapshot, 1:1 Event-Invoice, many-to-many event_freelancers)
+
+entity "users" as users {
+  * id : integer
+  --
+  username : varchar
+  role : varchar
+  sub_role : varchar
+  email : varchar
+}
+
+entity "freelancers" as freelancers {
+  * id : varchar
+  --
+  user_id : integer [nullable]
+  name : varchar
+  phone : varchar
+  role : varchar
+  status : varchar
+}
+
+entity "clients" as clients {
+  * id : integer
+  --
+  name : varchar
+  email : varchar
+  phone : varchar
+  client_type : varchar
+}
+
+entity "events" as events {
+  * id : varchar
+  --
+  client_id : integer
+  event_name : varchar
+  event_date : date
+  event_time : varchar
+  location : varchar
+  notes : text
+  backdrop_theme : varchar
+  total_price : numeric
+  status : varchar
+  sales_id : integer [nullable]
+}
+
+entity "invoices" as invoices {
+  * id : varchar
+  --
+  event_id : varchar
+  issue_date : date
+  due_date : date
+  total_amount : numeric
+  paid_amount : numeric
+  payment_status : varchar
+  discount_amount : numeric
+}
+
+entity "event_items" as event_items {
+  * id : serial
+  --
+  event_id : varchar
+  item_id : varchar           ' refers to master id (service or addon) but no FK
+  item_type : varchar        ' "service" | "addon" | other (backdrop/notes)
+  item_name : varchar        ' snapshot of name
+  item_price : numeric       ' snapshot of price
+  quantity : integer
+  backdrop_theme : varchar
+  notes : text
+}
+
+entity "services" as services {
+  * id : varchar
+  --
+  name : varchar
+  price_b2b : numeric
+  price_b2c : numeric
+}
+
+entity "addons" as addons {
+  * id : varchar
+  --
+  name : varchar
+  base_price : numeric
+}
+
+entity "event_freelancers" as event_freelancers {
+  * id : serial
+  --
+  event_id : varchar
+  freelancer_id : varchar
+  assigned_role : varchar
+}
+
+entity "price_history_log" as price_history_log {
+  * id : serial
+  --
+  service_id : varchar [nullable]
+  addon_id : varchar [nullable]
+  item_name : varchar
+  old_price_b2b : numeric [nullable]
+  new_price_b2b : numeric [nullable]
+  old_price_b2c : numeric [nullable]
+  new_price_b2c : numeric [nullable]
+  old_base_price : numeric [nullable]
+  new_base_price : numeric [nullable]
+  changed_at : timestamp
+}
+
+' Relationships / cardinalities
+users ||--o{ freelancers : "may link to (user_id nullable)"
+clients ||--o{ events : "1 client has many events"
+events ||--|| invoices : "1 event has 1 invoice (created on event creation)"
+events ||--o{ event_items : "1 event has many items"
+' event_items have polymorphic/reference snapshot to services/addons (no FK shown)
+
+events ||--o{ event_freelancers : "1 event has many event_freelancers"
+freelancers ||--o{ event_freelancers : "1 freelancer has many event_freelancers"
+
+' Many-to-many via junction
+events }o--o{ freelancers : "many-to-many via event_freelancers"
+
+' Price history links (nullable) to master data
+services ||--o{ price_history_log : "optional FK (service_id)"
+addons ||--o{ price_history_log : "optional FK (addon_id)"
+
+' Sales/user who created event (optional)
+users ||--o{ events : "sales_id (optional)"
+
+@enduml

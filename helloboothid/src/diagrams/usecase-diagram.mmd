@@ -1,0 +1,60 @@
+flowchart TD
+    Guest[Guest]
+    Client[Client]
+    Freelancer[Freelancer]
+    Owner[Owner]
+    Admin[Admin]
+
+    UC_ViewServices[View services / landing page]
+    UC_Register[Register account]
+    UC_Login[Login]
+    UC_Logout[Logout]
+    UC_Book[Book event / create booking]
+    UC_Availability[View availability]
+    UC_Invoice[View invoices]
+    UC_Schedule[Manage schedule]
+    UC_OwnerAvailability[Manage availability]
+    UC_Events[Manage events]
+    UC_Clients[Manage clients]
+    UC_Freelancers[Manage freelancers]
+    UC_Services[Manage services & addons]
+    UC_Addons[Manage addons]
+    UC_OwnerInvoices[Manage invoices]
+    UC_Dashboard[View dashboard / statistics / sales]
+    UC_Settings[Manage settings]
+    UC_Users[Manage users]
+
+    Guest --> UC_ViewServices
+    Guest --> UC_Register
+
+    Client --> UC_Login
+    Client --> UC_Logout
+    Client --> UC_ViewServices
+    Client --> UC_Book
+    Client --> UC_Availability
+    Client --> UC_Invoice
+
+    Freelancer --> UC_Login
+    Freelancer --> UC_Logout
+    Freelancer --> UC_Schedule
+    Freelancer --> UC_OwnerAvailability
+
+    Owner --> UC_Login
+    Owner --> UC_Logout
+    Owner --> UC_Events
+    Owner --> UC_Clients
+    Owner --> UC_Freelancers
+    Owner --> UC_Services
+    Owner --> UC_OwnerInvoices
+    Owner --> UC_Dashboard
+    Owner --> UC_Settings
+
+    Admin --> UC_Login
+    Admin --> UC_Logout
+    Admin --> UC_Users
+    Admin --> UC_Addons
+    Admin --> UC_Dashboard
+
+    UC_Book -. includes .-> UC_Availability
+    UC_Events -. includes .-> UC_Clients
+    UC_Services -. includes .-> UC_Addons

@@ -1,0 +1,45 @@
+flowchart TD
+    A[Pengunjung / Guest] --> B[Masuk Halaman Utama]
+    B --> C{Sudah punya akun?}
+    C -- Tidak --> D[Login / Register]
+    D --> E[Masuk ke sistem]
+    C -- Ya --> E
+
+    E --> F[Role: Admin / Owner]
+    E --> G[Role: Sales / Operational]
+    E --> H[Role: Freelancer / Crew]
+
+    F --> F1[Dashboard Admin]
+    F1 --> F2[Kelola Klien]
+    F1 --> F3[Kelola Event]
+    F1 --> F4[Kelola Layanan & Addon]
+    F1 --> F5[Kelola Invoice]
+    F1 --> F6[Lihat Statistik & Omzet]
+
+    G --> G1[Dashboard Sales]
+    G1 --> G2[Pilih Klien]
+    G2 --> G3[Isi Detail Event]
+    G3 --> G4[Pilih Paket & Addon]
+    G4 --> G5[Simpan Event]
+    G5 --> G6[Sistem buat Invoice otomatis]
+
+    H --> H1[Dashboard Freelancer]
+    H1 --> H2[Lihat Jadwal Event]
+    H2 --> H3[Update Ketersediaan]
+
+    F3 --> F7[Periksa Ketersediaan Tanggal]
+    F7 --> F8{Tanggal tersedia?}
+    F8 -- Ya --> F9[Buat Booking]
+    F8 -- Tidak --> F10[Pilih tanggal lain]
+
+    F9 --> G5
+
+    F2 --> F11[Tambah / Edit / Hapus Klien]
+    F4 --> F12[Tambah / Edit / Hapus Paket & Addon]
+    F5 --> F13[Review Status Pembayaran]
+
+    style A fill:#f8fafc,stroke:#64748b,stroke-width:1px
+    style D fill:#dbeafe,stroke:#2563eb,stroke-width:1px
+    style F fill:#dcfce7,stroke:#16a34a,stroke-width:1px
+    style G fill:#fef3c7,stroke:#d97706,stroke-width:1px
+    style H fill:#fce7f3,stroke:#db2777,stroke-width:1px
