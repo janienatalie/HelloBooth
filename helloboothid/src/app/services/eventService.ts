@@ -1,6 +1,5 @@
 // src/app/services/eventService.ts
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export const eventService = {
   addEvent: async (payload: any) => {
     const response = await fetch(`${BASE_URL}/events`, {
