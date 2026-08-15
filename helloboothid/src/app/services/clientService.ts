@@ -1,5 +1,9 @@
 // src/app/services/clientService.ts
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!BASE_URL) {
+  throw new Error("NEXT_PUBLIC_API_URL belum dikonfigurasi");
+}
 
 export const clientService = {
   getClients: async () => {

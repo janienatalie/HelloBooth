@@ -1,5 +1,5 @@
 // src/app/services/eventService.ts
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const eventService = {
   addEvent: async (payload: any) => {

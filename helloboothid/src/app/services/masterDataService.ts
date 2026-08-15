@@ -1,5 +1,5 @@
 // src/app/services/masterDataService.ts
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const masterDataService = {
   // Ambil Data Paket Utama
