@@ -5,10 +5,10 @@ import { query } from "../../../../lib/db"; // Menghapus import pool
 // PUT: Memperbarui data layanan & mencatat riwayat harga
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { name, price_b2b, price_b2c } = body;
 
@@ -96,10 +96,10 @@ export async function PUT(
 // DELETE: Menghapus layanan
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const dbQuery = `DELETE FROM services WHERE id = $1 RETURNING id`;
     const result = await query(dbQuery, [id]);
