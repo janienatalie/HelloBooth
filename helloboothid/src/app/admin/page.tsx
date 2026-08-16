@@ -234,7 +234,6 @@ export default function DashboardPage() {
   if (safeRoleText.includes("b2c")) displayRole = "Sales B2C";
   if (safeRoleText.includes("manager")) displayRole = "Event Manager";
 
-  // LOGIKA FRONTEND: Tampilkan semua event (tidak filter inquiry) dengan batas maksimal 5 baris
   const visibleEvents = recentEvents.slice(0, 5);
 
   const safeMonthlyData =
@@ -484,25 +483,68 @@ export default function DashboardPage() {
                       statusText = t.statusCancelled;
                       Icon = XCircle;
                     } else {
-                      // KUNCI UTAMA: Abaikan Inquiry/Confirmed, murni hitung tanggal!
+                      // KUNCI UTAMA: Logika jam event
                       const eventDate = new Date(evt.date);
                       const today = new Date();
 
-                      // Hapus jam/menit agar perbandingan akurat berdasarkan hari
-                      eventDate.setHours(0, 0, 0, 0);
-                      today.setHours(0, 0, 0, 0);
+                      const timeStr = evt.event_time || "";
+                      const parts = timeStr
+                        .split("-")
+                        .map((s: string) => s.trim());
 
-                      if (eventDate.getTime() === today.getTime()) {
-                        effectiveStatus = "ongoing";
-                        statusText = t.statusOngoing;
-                        Icon = Activity;
-                      } else if (eventDate.getTime() < today.getTime()) {
-                        // Jika tanggal sudah terlewat tapi Sales belum klik Done
+                      let startH = 0,
+                        startM = 0,
+                        endH = 23,
+                        endM = 59;
+
+                      if (parts.length > 0) {
+                        const startTimeParts = parts[0].split(":");
+                        if (startTimeParts.length > 1) {
+                          startH = Number(startTimeParts[0]);
+                          startM = Number(startTimeParts[1]);
+                        }
+                      }
+
+                      if (parts.length > 1) {
+                        const endTimeParts = parts[1].split(":");
+                        if (endTimeParts.length > 1) {
+                          endH = Number(endTimeParts[0]);
+                          endM = Number(endTimeParts[1]);
+                        }
+                      }
+
+                      const eventStartTime = new Date(
+                        eventDate.getFullYear(),
+                        eventDate.getMonth(),
+                        eventDate.getDate(),
+                        startH,
+                        startM,
+                        0,
+                      );
+                      const eventFinishTime = new Date(
+                        eventDate.getFullYear(),
+                        eventDate.getMonth(),
+                        eventDate.getDate(),
+                        endH,
+                        endM,
+                        59,
+                      );
+
+                      if (now > eventFinishTime) {
+                        // Jika sudah melewati waktu selesai
                         effectiveStatus = "completed";
                         statusText = t.statusCompleted;
                         Icon = CheckCircle2;
+                      } else if (
+                        now >= eventStartTime &&
+                        now <= eventFinishTime
+                      ) {
+                        // Jika saat ini berada di antara waktu mulai dan selesai
+                        effectiveStatus = "ongoing";
+                        statusText = t.statusOngoing;
+                        Icon = Activity;
                       } else {
-                        // Jika tanggal masih di masa depan
+                        // Jika belum masuk waktu mulai (bahkan jika harinya sama)
                         effectiveStatus = "upcoming";
                         statusText = t.statusUpcoming;
                         Icon = Calendar;
