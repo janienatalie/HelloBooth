@@ -27,7 +27,7 @@ async function getUserFromToken() {
 // GET: Mengambil detail klien berdasarkan ID beserta history event-nya
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getUserFromToken();
@@ -38,7 +38,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const clientQuery = `SELECT * FROM clients WHERE id = $1`;
     const clientResult = await query(clientQuery, [id]);
@@ -76,7 +76,7 @@ export async function GET(
 // PUT: Memperbarui data klien
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getUserFromToken();
@@ -87,7 +87,7 @@ export async function PUT(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { name, email, phone, client_type } = body;
 
@@ -124,7 +124,7 @@ export async function PUT(
 // DELETE: Menghapus data klien (Hanya untuk tim Sales)
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const user = await getUserFromToken();
@@ -152,7 +152,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const dbQuery = `DELETE FROM clients WHERE id = $1 RETURNING id`;
     const result = await query(dbQuery, [id]);
 
