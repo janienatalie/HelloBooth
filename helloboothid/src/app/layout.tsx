@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "HelloBoothid | Operational System",
   description: "Sistem Manajemen Operasional Terpadu",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
