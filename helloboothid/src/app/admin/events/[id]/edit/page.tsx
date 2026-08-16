@@ -124,11 +124,15 @@ export default function EditEventPage() {
 
         const sRes = await fetch("/api/services");
         const sData = await sRes.json();
-        if (sData.status === "success") setMasterServices(sData.data);
+        // PERBAIKAN: Mengambil data array .services dari API
+        if (sData.status === "success")
+          setMasterServices(sData.data.services || []);
 
         const aRes = await fetch("/api/addons");
         const aData = await aRes.json();
-        if (aData.status === "success") setMasterAddons(aData.data);
+        // PERBAIKAN: Mengambil data array .addons dari API
+        if (aData.status === "success")
+          setMasterAddons(aData.data.addons || []);
 
         const evRes = await fetch(`/api/events/${eventId}`);
         const evData = await evRes.json();
