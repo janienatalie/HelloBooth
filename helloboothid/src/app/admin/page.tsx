@@ -20,6 +20,63 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/providers/AppProvider";
 
+// HELPER: Menghitung status fisik kronologis acara secara Real-Time (Universal)
+function getEventChronologicalStatus(event: any) {
+  if (
+    (event.status || "").toLowerCase() === "cancelled" ||
+    (event.status || "").toLowerCase() === "batal"
+  ) {
+    return "canceled";
+  }
+
+  if ((event.status || "").toLowerCase() === "done") {
+    return "completed";
+  }
+
+  const now = new Date();
+
+  // SUPPORT DUAL-KEY: 'date' untuk Dashboard, 'event_date' untuk halaman Events
+  const dateString = event.date || event.event_date;
+  if (!dateString) return "upcoming";
+
+  const eventDate = new Date(dateString);
+  if (isNaN(eventDate.getTime())) return "upcoming";
+
+  let startHour = 0;
+  let startMinute = 0;
+  let endHour = 23;
+  let endMinute = 59;
+
+  // SUPPORT DUAL-KEY: 'time' untuk Dashboard, 'event_time' untuk halaman Events
+  const timeString = event.time || event.event_time;
+
+  if (timeString && timeString.includes("-")) {
+    const parts = timeString.split("-").map((p: string) => p.trim());
+
+    if (parts[0] && parts[0].includes(":")) {
+      const [h, m] = parts[0].split(":").map(Number);
+      if (!isNaN(h)) startHour = h;
+      if (!isNaN(m)) startMinute = m;
+    }
+
+    if (parts[1] && parts[1].includes(":")) {
+      const [h, m] = parts[1].split(":").map(Number);
+      if (!isNaN(h)) endHour = h;
+      if (!isNaN(m)) endMinute = m;
+    }
+  }
+
+  const startDateTime = new Date(eventDate);
+  startDateTime.setHours(startHour, startMinute, 0, 0);
+
+  const endDateTime = new Date(eventDate);
+  endDateTime.setHours(endHour, endMinute, 59, 999);
+
+  if (now < startDateTime) return "upcoming";
+  if (now >= startDateTime && now <= endDateTime) return "ongoing";
+  return "completed";
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { lang } = useLanguage();
@@ -476,71 +533,29 @@ export default function DashboardPage() {
 
                   // LOGIKA FRONTEND: Perbedaan tampilan status Sales vs Event Manager
                   if (isEventManager) {
-                    if (rawStatus === "done") {
-                      effectiveStatus = "completed";
-                      statusText = t.statusCompleted;
-                      Icon = CheckCircle2;
-                    } else if (
-                      rawStatus === "cancelled" ||
-                      rawStatus === "batal"
-                    ) {
-                      effectiveStatus = "cancelled";
-                      statusText = t.statusCancelled;
-                      Icon = XCircle;
-                    } else {
-                      // KUNCI UTAMA: Logika jam event terhubung dengan waktu saat ini (Real-Time)
-                      const now = new Date();
-                      const eventDate = new Date(evt.date || evt.event_date);
+                    // Gunakan Helper Function Universal
+                    const chronoStatus = getEventChronologicalStatus(evt);
 
-                      let startH = 0,
-                        startM = 0,
-                        endH = 23,
-                        endM = 59;
+                    effectiveStatus = chronoStatus;
 
-                      const timeStr = evt.event_time || "";
-                      if (timeStr && timeStr.includes("-")) {
-                        const parts = timeStr
-                          .split("-")
-                          .map((s: string) => s.trim());
-
-                        if (parts[0] && parts[0].includes(":")) {
-                          const [h, m] = parts[0].split(":").map(Number);
-                          if (!isNaN(h)) startH = h;
-                          if (!isNaN(m)) startM = m;
-                        }
-
-                        if (parts[1] && parts[1].includes(":")) {
-                          const [h, m] = parts[1].split(":").map(Number);
-                          if (!isNaN(h)) endH = h;
-                          if (!isNaN(m)) endM = m;
-                        }
-                      }
-
-                      const eventStartTime = new Date(eventDate);
-                      eventStartTime.setHours(startH, startM, 0, 0);
-
-                      const eventFinishTime = new Date(eventDate);
-                      eventFinishTime.setHours(endH, endM, 59, 999);
-
-                      if (now < eventStartTime) {
-                        // Jika jam sekarang BELUM melewati waktu mulai
-                        effectiveStatus = "upcoming";
-                        statusText = t.statusUpcoming;
-                        Icon = Calendar;
-                      } else if (
-                        now >= eventStartTime &&
-                        now <= eventFinishTime
-                      ) {
-                        // Jika jam sekarang SEDANG di antara waktu mulai dan selesai
-                        effectiveStatus = "ongoing";
-                        statusText = t.statusOngoing;
-                        Icon = Activity;
-                      } else {
-                        // Jika jam sekarang SUDAH melewati waktu selesai
-                        effectiveStatus = "completed";
+                    switch (chronoStatus) {
+                      case "completed":
                         statusText = t.statusCompleted;
                         Icon = CheckCircle2;
-                      }
+                        break;
+                      case "canceled":
+                        statusText = t.statusCancelled;
+                        Icon = XCircle;
+                        break;
+                      case "ongoing":
+                        statusText = t.statusOngoing;
+                        Icon = Activity;
+                        break;
+                      case "upcoming":
+                      default:
+                        statusText = t.statusUpcoming;
+                        Icon = Calendar;
+                        break;
                     }
                   } else {
                     // Logika tampilan untuk Sales / Admin (TETAP SAMA)
@@ -579,7 +594,7 @@ export default function DashboardPage() {
                       <td className="py-4 px-6">
                         <p className="flex items-center gap-1.5 text-sm font-bold text-slate-700 dark:text-slate-300">
                           <Clock className="w-3.5 h-3.5 text-slate-400" />{" "}
-                          {formatDate(evt.date)}
+                          {formatDate(evt.date || evt.event_date)}
                         </p>
                         <p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
                           <MapPin className="w-3 h-3 text-slate-400 shrink-0" />{" "}
