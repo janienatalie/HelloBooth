@@ -485,7 +485,7 @@ export default function DashboardPage() {
                     } else {
                       // KUNCI UTAMA: Logika jam event
                       const eventDate = new Date(evt.date);
-                      const today = new Date();
+                      const now = new Date();
 
                       const timeStr = evt.event_time || "";
                       const parts = timeStr
