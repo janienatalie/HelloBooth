@@ -63,14 +63,21 @@ export default function MasterDataPage() {
 
   const refreshData = async () => {
     setLoading(true);
+
     try {
       const [pkgs, adds] = await Promise.all([
         masterDataService.getPackages(),
         masterDataService.getAddons(),
       ]);
 
-      setPackagesData(pkgs);
-      setAddonsData(adds);
+      console.log("=== MASTER DATA DEBUG ===");
+      console.log("Packages:", pkgs);
+      console.log("Packages array?", Array.isArray(pkgs));
+      console.log("Addons:", adds);
+      console.log("Addons array?", Array.isArray(adds));
+
+      setPackagesData(Array.isArray(pkgs) ? pkgs : []);
+      setAddonsData(Array.isArray(adds) ? adds : []);
     } catch (error) {
       console.error("Gagal sinkronisasi data:", error);
     } finally {
