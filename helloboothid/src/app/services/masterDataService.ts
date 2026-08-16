@@ -7,7 +7,7 @@ export const masterDataService = {
     const result = await response.json();
 
     // Kembali menggunakan struktur data dari Hapi.js
-    return result.data.services.map((s: any) => ({
+    return result.data.map((s: any) => ({
       id: s.id.toString(),
       name: s.name,
       price_b2b: parseFloat(s.price_b2b) || 0,
