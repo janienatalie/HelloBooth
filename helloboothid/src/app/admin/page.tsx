@@ -208,6 +208,8 @@ export default function DashboardPage() {
       case "completed":
         return "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-500/20";
       case "cancelled":
+      case "canceled":
+      case "batal":
         return "bg-gray-100 text-gray-500 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700";
       default:
         return "bg-slate-100 text-slate-600 border-slate-200";
@@ -478,76 +480,66 @@ export default function DashboardPage() {
                       effectiveStatus = "completed";
                       statusText = t.statusCompleted;
                       Icon = CheckCircle2;
-                    } else if (rawStatus === "cancelled") {
+                    } else if (
+                      rawStatus === "cancelled" ||
+                      rawStatus === "batal"
+                    ) {
                       effectiveStatus = "cancelled";
                       statusText = t.statusCancelled;
                       Icon = XCircle;
                     } else {
-                      // KUNCI UTAMA: Logika jam event
-                      const eventDate = new Date(evt.date);
+                      // KUNCI UTAMA: Logika jam event terhubung dengan waktu saat ini (Real-Time)
                       const now = new Date();
-
-                      const timeStr = evt.event_time || "";
-                      const parts = timeStr
-                        .split("-")
-                        .map((s: string) => s.trim());
+                      const eventDate = new Date(evt.date || evt.event_date);
 
                       let startH = 0,
                         startM = 0,
                         endH = 23,
                         endM = 59;
 
-                      if (parts.length > 0) {
-                        const startTimeParts = parts[0].split(":");
-                        if (startTimeParts.length > 1) {
-                          startH = Number(startTimeParts[0]);
-                          startM = Number(startTimeParts[1]);
+                      const timeStr = evt.event_time || "";
+                      if (timeStr && timeStr.includes("-")) {
+                        const parts = timeStr
+                          .split("-")
+                          .map((s: string) => s.trim());
+
+                        if (parts[0] && parts[0].includes(":")) {
+                          const [h, m] = parts[0].split(":").map(Number);
+                          if (!isNaN(h)) startH = h;
+                          if (!isNaN(m)) startM = m;
+                        }
+
+                        if (parts[1] && parts[1].includes(":")) {
+                          const [h, m] = parts[1].split(":").map(Number);
+                          if (!isNaN(h)) endH = h;
+                          if (!isNaN(m)) endM = m;
                         }
                       }
 
-                      if (parts.length > 1) {
-                        const endTimeParts = parts[1].split(":");
-                        if (endTimeParts.length > 1) {
-                          endH = Number(endTimeParts[0]);
-                          endM = Number(endTimeParts[1]);
-                        }
-                      }
+                      const eventStartTime = new Date(eventDate);
+                      eventStartTime.setHours(startH, startM, 0, 0);
 
-                      const eventStartTime = new Date(
-                        eventDate.getFullYear(),
-                        eventDate.getMonth(),
-                        eventDate.getDate(),
-                        startH,
-                        startM,
-                        0,
-                      );
-                      const eventFinishTime = new Date(
-                        eventDate.getFullYear(),
-                        eventDate.getMonth(),
-                        eventDate.getDate(),
-                        endH,
-                        endM,
-                        59,
-                      );
+                      const eventFinishTime = new Date(eventDate);
+                      eventFinishTime.setHours(endH, endM, 59, 999);
 
-                      if (now > eventFinishTime) {
-                        // Jika sudah melewati waktu selesai
-                        effectiveStatus = "completed";
-                        statusText = t.statusCompleted;
-                        Icon = CheckCircle2;
+                      if (now < eventStartTime) {
+                        // Jika jam sekarang BELUM melewati waktu mulai
+                        effectiveStatus = "upcoming";
+                        statusText = t.statusUpcoming;
+                        Icon = Calendar;
                       } else if (
                         now >= eventStartTime &&
                         now <= eventFinishTime
                       ) {
-                        // Jika saat ini berada di antara waktu mulai dan selesai
+                        // Jika jam sekarang SEDANG di antara waktu mulai dan selesai
                         effectiveStatus = "ongoing";
                         statusText = t.statusOngoing;
                         Icon = Activity;
                       } else {
-                        // Jika belum masuk waktu mulai (bahkan jika harinya sama)
-                        effectiveStatus = "upcoming";
-                        statusText = t.statusUpcoming;
-                        Icon = Calendar;
+                        // Jika jam sekarang SUDAH melewati waktu selesai
+                        effectiveStatus = "completed";
+                        statusText = t.statusCompleted;
+                        Icon = CheckCircle2;
                       }
                     }
                   } else {
@@ -558,7 +550,10 @@ export default function DashboardPage() {
                     } else if (rawStatus === "confirmed") {
                       statusText = t.statusConfirmed;
                       Icon = CheckCircle2;
-                    } else if (rawStatus === "cancelled") {
+                    } else if (
+                      rawStatus === "cancelled" ||
+                      rawStatus === "batal"
+                    ) {
                       statusText = t.statusCancelled;
                       Icon = XCircle;
                     } else {
