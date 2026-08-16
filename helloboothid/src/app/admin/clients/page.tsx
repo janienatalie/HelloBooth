@@ -13,7 +13,6 @@ import {
   X,
 } from "lucide-react";
 import { useLanguage } from "@/providers/AppProvider";
-import { clientService } from "@/app/services/clientService";
 
 export default function ClientsPage() {
   const router = useRouter();
@@ -61,11 +60,15 @@ export default function ClientsPage() {
     }
   };
 
+  // UBAHAN: Langsung fetch ke endpoint Next.js baru
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const data = await clientService.getClients();
-      setClients(data || []);
+      const res = await fetch("/api/clients", { cache: "no-store" });
+      const json = await res.json();
+      if (json.status === "success") {
+        setClients(json.data.clients || []);
+      }
     } catch (error) {
       console.error("Gagal mengambil data klien:", error);
     } finally {
@@ -183,23 +186,36 @@ export default function ClientsPage() {
       return;
     }
 
+    // UBAHAN: Langsung POST ke endpoint Next.js baru
     try {
-      const result = await clientService.addClient({
-        name: newClient.name,
-        email: newClient.email,
-        phone: newClient.phone,
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newClient.name,
+          email: newClient.email,
+          phone: newClient.phone,
+        }),
       });
+
+      const result = await res.json();
 
       if (result.status === "success") {
         closeModal();
         fetchClients();
+      } else {
+        alert(
+          result.message ||
+            (lang === "id"
+              ? "Gagal menambahkan klien."
+              : "Failed to add client."),
+        );
       }
     } catch (error: any) {
       alert(
-        error.message ||
-          (lang === "id"
-            ? "Gagal menambahkan klien."
-            : "Failed to add client."),
+        lang === "id"
+          ? "Terjadi kesalahan jaringan."
+          : "Network error occurred.",
       );
     }
   };

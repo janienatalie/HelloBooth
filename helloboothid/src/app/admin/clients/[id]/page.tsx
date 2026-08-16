@@ -20,7 +20,6 @@ import {
   Save,
 } from "lucide-react";
 import { useLanguage } from "@/providers/AppProvider";
-import { clientService } from "@/app/services/clientService";
 
 export default function ClientDetailPage() {
   const params = useParams();
@@ -65,22 +64,30 @@ export default function ClientDetailPage() {
     }
   };
 
-  // Ambil Data dari Backend
+  // UBAHAN: Ambil Data Detail dari Backend Next.js
   const fetchClientDetail = async () => {
+    setLoading(true);
     try {
-      const data = await clientService.getClientById(clientId);
-
-      const clientObj = data.client || data;
-      setClientData(clientObj);
-      setClientEvents(clientObj.events || []);
-
-      setEditForm({
-        name: clientObj.name,
-        email: clientObj.email,
-        phone: clientObj.phone,
+      const res = await fetch(`/api/clients/${clientId}`, {
+        cache: "no-store",
       });
+      const json = await res.json();
+
+      if (json.status === "success") {
+        const clientObj = json.data.client;
+        setClientData(clientObj);
+        setClientEvents(clientObj.events || []);
+
+        setEditForm({
+          name: clientObj.name,
+          email: clientObj.email,
+          phone: clientObj.phone,
+        });
+      } else {
+        console.error("Gagal mengambil detail klien:", json.message);
+      }
     } catch (error) {
-      console.error("Gagal mengambil detail klien:", error);
+      console.error("Terjadi kesalahan jaringan:", error);
     } finally {
       setLoading(false);
     }
@@ -91,12 +98,15 @@ export default function ClientDetailPage() {
     if (clientId) fetchClientDetail();
   }, [clientId]);
 
-  // Fungsi Simpan Perubahan (Update)
+  // UBAHAN: Fungsi Simpan Perubahan (Update) langsung tembak ke Next.js API
   const handleUpdateClient = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const allClients = await clientService.getClients();
+      // Fetch semua data klien untuk cek duplikasi
+      const resClients = await fetch("/api/clients", { cache: "no-store" });
+      const jsonClients = await resClients.json();
+      const allClients = jsonClients.data?.clients || [];
 
       const duplicateEmail = allClients.find(
         (c: any) =>
@@ -109,40 +119,84 @@ export default function ClientDetailPage() {
       );
 
       if (duplicateEmail) {
-        alert(`Email "${editForm.email}" sudah digunakan oleh klien lain.`);
+        alert(
+          lang === "id"
+            ? `Email "${editForm.email}" sudah digunakan oleh klien lain.`
+            : `Email "${editForm.email}" is already used by another client.`,
+        );
         return;
       }
 
       if (duplicatePhone) {
         alert(
-          `Nomor WhatsApp "${editForm.phone}" sudah digunakan oleh klien lain.`,
+          lang === "id"
+            ? `Nomor WhatsApp "${editForm.phone}" sudah digunakan oleh klien lain.`
+            : `WhatsApp Number "${editForm.phone}" is already used by another client.`,
         );
         return;
       }
 
       setIsSaving(true);
-      const result = await clientService.updateClient(clientId, editForm);
 
-      if (result.status === "success") {
+      const resUpdate = await fetch(`/api/clients/${clientId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
+      });
+      const jsonUpdate = await resUpdate.json();
+
+      if (jsonUpdate.status === "success") {
         await fetchClientDetail();
         setShowEditModal(false);
+      } else {
+        alert(
+          jsonUpdate.message ||
+            (lang === "id"
+              ? "Gagal memperbarui data klien."
+              : "Failed to update client data."),
+        );
       }
     } catch (error: any) {
-      alert(error.message || "Gagal memperbarui data klien.");
+      alert(
+        lang === "id"
+          ? "Terjadi kesalahan jaringan."
+          : "Network error occurred.",
+      );
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Fungsi Hapus
+  // UBAHAN: Fungsi Hapus langsung tembak ke Next.js API
   const handleDeleteClient = async () => {
     try {
-      await clientService.deleteClient(clientId);
-      setShowDeleteModal(false);
-      router.push("/admin/clients");
-      alert("Data klien telah dihapus.");
+      const res = await fetch(`/api/clients/${clientId}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+
+      if (json.status === "success") {
+        setShowDeleteModal(false);
+        alert(
+          lang === "id"
+            ? "Data klien telah dihapus."
+            : "Client data has been deleted.",
+        );
+        router.push("/admin/clients");
+      } else {
+        alert(
+          json.message ||
+            (lang === "id"
+              ? "Gagal menghapus klien."
+              : "Failed to delete client."),
+        );
+      }
     } catch (error: any) {
-      alert(error.message || "Gagal menghapus klien.");
+      alert(
+        lang === "id"
+          ? "Terjadi kesalahan jaringan."
+          : "Network error occurred.",
+      );
     }
   };
 
@@ -168,6 +222,8 @@ export default function ClientDetailPage() {
       cancel: "Batal",
       confirmDel: "Ya, Hapus",
       save: "Simpan Perubahan",
+      loadingDetails: "Memuat detail klien...",
+      noData: "Data tidak ditemukan.",
     },
     en: {
       back: "Back to Clients",
@@ -190,21 +246,17 @@ export default function ClientDetailPage() {
       cancel: "Cancel",
       confirmDel: "Yes, Delete",
       save: "Save Changes",
+      loadingDetails: "Loading client details...",
+      noData: "Data not found.",
     },
   }[lang];
 
   if (loading)
     return (
-      <div className="p-12 text-center text-slate-500">
-        Memuat detail klien...
-      </div>
+      <div className="p-12 text-center text-slate-500">{t.loadingDetails}</div>
     );
   if (!clientData)
-    return (
-      <div className="p-12 text-center text-slate-500">
-        Data tidak ditemukan.
-      </div>
-    );
+    return <div className="p-12 text-center text-slate-500">{t.noData}</div>;
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
