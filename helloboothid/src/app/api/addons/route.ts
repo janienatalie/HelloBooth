@@ -7,7 +7,10 @@ export async function GET() {
     const result = await query(
       "SELECT id, name, base_price FROM addons ORDER BY name ASC",
     );
-    return NextResponse.json({ status: "success", data: result.rows });
+    return NextResponse.json({
+      status: "success",
+      data: { addons: result.rows },
+    });
   } catch (error: any) {
     return NextResponse.json(
       { status: "error", message: error.message },
