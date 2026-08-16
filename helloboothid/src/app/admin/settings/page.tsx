@@ -13,7 +13,6 @@ import {
   DollarSign,
   ArrowUpDown,
 } from "lucide-react";
-import { masterDataService } from "@/app/services/masterDataService";
 import { useLanguage } from "@/providers/AppProvider";
 
 interface MasterDataItem {
@@ -65,10 +64,28 @@ export default function MasterDataPage() {
     setLoading(true);
 
     try {
-      const [pkgs, adds] = await Promise.all([
-        masterDataService.getPackages(),
-        masterDataService.getAddons(),
+      // Fetch Packages and Addons from Next.js API Routes concurrently
+      const [pkgsRes, addsRes] = await Promise.all([
+        fetch("/api/services", { cache: "no-store" }),
+        fetch("/api/addons", { cache: "no-store" }),
       ]);
+
+      let pkgs = [];
+      let adds = [];
+
+      if (pkgsRes.ok) {
+        const pkgsJson = await pkgsRes.json();
+        if (pkgsJson.status === "success") {
+          pkgs = pkgsJson.data?.services || [];
+        }
+      }
+
+      if (addsRes.ok) {
+        const addsJson = await addsRes.json();
+        if (addsJson.status === "success") {
+          adds = addsJson.data?.addons || [];
+        }
+      }
 
       console.log("=== MASTER DATA DEBUG ===");
       console.log("Packages:", pkgs);
@@ -252,9 +269,23 @@ export default function MasterDataPage() {
         };
 
         if (selectedItem) {
-          await masterDataService.updatePackage(selectedItem.id, payload);
+          // Update Package via Next.js API
+          const res = await fetch(`/api/services/${selectedItem.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) throw new Error("Gagal mengupdate paket");
         } else {
-          await masterDataService.addPackage(payload);
+          // Add Package via Next.js API
+          const res = await fetch("/api/services", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) throw new Error("Gagal menambah paket");
         }
       } else {
         const payload = {
@@ -263,9 +294,21 @@ export default function MasterDataPage() {
         };
 
         if (selectedItem) {
-          await masterDataService.updateAddon(selectedItem.id, payload);
+          // Update Addon via Next.js API
+          const res = await fetch(`/api/addons/${selectedItem.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error("Gagal mengupdate addon");
         } else {
-          await masterDataService.addAddon(payload);
+          // Add Addon via Next.js API
+          const res = await fetch("/api/addons", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error("Gagal menambah addon");
         }
       }
 
@@ -273,6 +316,7 @@ export default function MasterDataPage() {
       setIsFormModalOpen(false);
     } catch (error) {
       alert("Gagal memproses data.");
+      console.error(error);
     }
   };
 
